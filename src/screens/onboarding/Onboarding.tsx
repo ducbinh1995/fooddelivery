@@ -1,4 +1,5 @@
-import React, { useRef } from "react";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import React, { useRef, useState } from "react";
 import {
   Animated,
   FlatList,
@@ -7,6 +8,7 @@ import {
   StyleSheet,
   Text,
   View,
+  ViewToken,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import DefaultImage from "../../components/ui/DefaultImage";
@@ -14,6 +16,7 @@ import TextButton from "../../components/ui/TextButton";
 import { COLORS } from "../../constants/colors";
 import { FONTS } from "../../constants/fonts";
 import { SIZES } from "../../constants/sizes";
+import { AuthStackParamList } from "../../routes/AuthStack";
 
 interface OnboardingItem {
   id: number;
@@ -50,8 +53,19 @@ const onboarding_screens: OnboardingItem[] = [
   },
 ];
 
-const Onboarding = () => {
+type OnboardingProps = NativeStackScreenProps<AuthStackParamList, "Onboarding">;
+
+const Onboarding = (props: OnboardingProps) => {
   const flatlistRef = useRef<FlatList>(null);
+
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  const scrollX = useRef(new Animated.Value(0)).current;
+  const onChangeViewRef = useRef(
+    (info: { viewableItems: ViewToken[]; changed: ViewToken[] }) => {
+      setCurrentIndex(info.viewableItems[0].index || 0);
+    }
+  );
 
   const renderLogo = () => {
     return (
@@ -99,45 +113,63 @@ const Onboarding = () => {
         <View style={styles.footerDotContainer}>
           <Dots />
         </View>
-        <View style={styles.footerButtonContainer}>
-          <TextButton
-            label="Skip"
-            containerStyle={{
-              backgroundColor: COLORS.transparent,
+        {currentIndex < onboarding_screens.length - 1 && (
+          <View style={styles.footerButtonContainer}>
+            <TextButton
+              label="Skip"
+              containerStyle={{
+                backgroundColor: COLORS.transparent,
+              }}
+              labelStyle={{
+                color: COLORS.darkGray2,
+              }}
+              onPress={() => console.log("skip")}
+            />
+            <TextButton
+              label="Next"
+              containerStyle={{
+                height: 60,
+                width: 200,
+                borderRadius: SIZES.radius,
+              }}
+              labelStyle={{}}
+              onPress={() => {
+                let index = Math.ceil(
+                  Number((scrollX as any)._value / SIZES.width)
+                );
+                if (index < onboarding_screens.length - 1) {
+                  flatlistRef.current?.scrollToIndex({
+                    index: index + 1,
+                    animated: true,
+                  });
+                }
+              }}
+            />
+          </View>
+        )}
+        {currentIndex === onboarding_screens.length - 1 && (
+          <View
+            style={{
+              paddingHorizontal: SIZES.padding,
+              marginVertical: SIZES.padding,
             }}
-            labelStyle={{
-              color: COLORS.darkGray2,
-            }}
-            onPress={() => console.log("skip")}
-          />
-          <TextButton
-            label="Next"
-            containerStyle={{
-              height: 60,
-              width: 200,
-              borderRadius: SIZES.radius,
-            }}
-            labelStyle={{}}
-            onPress={() => {
-              let index = Math.ceil(
-                Number((scrollX as any)._value / SIZES.width)
-              );
-              if (index < onboarding_screens.length - 1) {
-                flatlistRef.current?.scrollToIndex({
-                  index: index + 1,
-                  animated: true,
-                });
-              } else {
-                console.log("end");
-              }
-            }}
-          />
-        </View>
+          >
+            <TextButton
+              label="Let's Get Started"
+              containerStyle={{
+                height: 60,
+                borderRadius: SIZES.radius,
+              }}
+              labelStyle={{}}
+              onPress={() => {
+                props.navigation.navigate("SignIn");
+              }}
+            />
+          </View>
+        )}
       </View>
     );
   };
-
-  const scrollX = new Animated.Value(0);
 
   const Dots = () => {
     const dotPosition = Animated.divide(scrollX, SIZES.width);
@@ -192,6 +224,7 @@ const Onboarding = () => {
           [{ nativeEvent: { contentOffset: { x: scrollX } } }],
           { useNativeDriver: false }
         )}
+        onViewableItemsChanged={onChangeViewRef.current}
       />
       {renderFooter()}
     </View>

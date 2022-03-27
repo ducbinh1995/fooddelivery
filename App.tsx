@@ -1,6 +1,8 @@
+import { NavigationContainer } from "@react-navigation/native";
 import AppLoading from "expo-app-loading";
 import { useFonts } from "expo-font";
 import { StyleSheet } from "react-native";
+import AuthStack from "./src/routes/AuthStack";
 import Onboarding from "./src/screens/onboarding/Onboarding";
 
 export default function App() {
@@ -15,7 +17,11 @@ export default function App() {
     return <AppLoading />;
   }
 
-  return <Onboarding />;
+  return (
+    <NavigationContainer>
+      <AuthStack />
+    </NavigationContainer>
+  );
 }
 
 const styles = StyleSheet.create({
