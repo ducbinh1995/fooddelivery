@@ -3,7 +3,6 @@ import React, { useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import AuthLayout from "../../components/auth/AuthLayout";
 import DefaultImage from "../../components/ui/DefaultImage";
-import DefaultSwitch from "../../components/ui/DefaultSwitch";
 import FormInput from "../../components/ui/FormInput";
 import TextButton from "../../components/ui/TextButton";
 import TextIconButton from "../../components/ui/TextIconButton";
@@ -13,14 +12,15 @@ import { SIZES } from "../../constants/sizes";
 import { AuthStackParamList } from "../../routes/AuthStack";
 import { validateEmail, validatePassword } from "../../utils/utils";
 
-type SigninProps = NativeStackScreenProps<AuthStackParamList, "SignIn">;
+type SignupProps = NativeStackScreenProps<AuthStackParamList, "Signup">;
 
-const SignIn = (props: SigninProps) => {
+const Signup = (props: SignupProps) => {
   const [email, setEmail] = useState("");
+  const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
   const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [saveMe, setSaveMe] = useState(false);
 
   return (
     <View style={styles.container}>
@@ -66,16 +66,37 @@ const SignIn = (props: SigninProps) => {
           />
           <FormInput
             containerStyle={{ marginTop: SIZES.radius }}
+            label={"Username"}
+            keyboardType="default"
+            placeholder={""}
+            inputStyle={{}}
+            onChange={setUserName}
+            errorMsg={""}
+            appendComponent={
+              <View style={{ justifyContent: "center" }}>
+                <DefaultImage
+                  source={require("../../../assets/images/correct.png")}
+                  height={20}
+                  width={20}
+                  containerStyle={{
+                    tintColor: userName === "" ? COLORS.gray : COLORS.green,
+                  }}
+                />
+              </View>
+            }
+          />
+          <FormInput
+            containerStyle={{ marginTop: SIZES.radius }}
             label={"Password"}
             autoCompeleteType="password"
             placeholder={""}
             inputStyle={{}}
             onChange={(value) => {
-              validatePassword(value, () => {});
+              validatePassword(value, setPasswordError);
               setPassword(value);
             }}
             secureTextEntry={!showPassword}
-            errorMsg={""}
+            errorMsg={passwordError}
             appendComponent={
               <TouchableOpacity
                 style={styles.showPasswordContainer}
@@ -94,19 +115,6 @@ const SignIn = (props: SigninProps) => {
               </TouchableOpacity>
             }
           />
-          <View style={styles.saveMeContainer}>
-            <DefaultSwitch
-              value={saveMe}
-              onChange={setSaveMe}
-              label={"Save me"}
-            />
-            <TextButton
-              containerStyle={{ backgroundColor: COLORS.transparent }}
-              label={"Forgot Password?"}
-              labelStyle={{ color: COLORS.gray, ...FONTS.body4 }}
-              onPress={() => {}}
-            />
-          </View>
           <TextButton
             containerStyle={{
               height: 55,
@@ -114,24 +122,36 @@ const SignIn = (props: SigninProps) => {
               marginTop: SIZES.padding,
               borderRadius: SIZES.radius,
               backgroundColor:
-                email !== "" && password !== "" && emailError === ""
+                email !== "" &&
+                password !== "" &&
+                emailError === "" &&
+                userName !== "" &&
+                passwordError === ""
                   ? COLORS.primary
                   : COLORS.transparentPrimary,
             }}
-            label={"Sign In"}
+            label={"Sign Up"}
             labelStyle={{}}
             onPress={() => {}}
-            disabled={!(email !== "" && password !== "" && emailError === "")}
+            disabled={
+              !(
+                email !== "" &&
+                password !== "" &&
+                emailError === "" &&
+                userName !== "" &&
+                passwordError === ""
+              )
+            }
           />
           <View style={[styles.saveMeContainer, { justifyContent: "center" }]}>
             <Text style={{ color: COLORS.darkGray, ...FONTS.body3 }}>
-              Don't have an account?
+              Already have an account?
             </Text>
             <TextButton
               containerStyle={{ backgroundColor: COLORS.transparent }}
-              label={" Signup"}
+              label={" Sign in"}
               labelStyle={{ color: COLORS.primary, ...FONTS.h3 }}
-              onPress={() => props.navigation.navigate("Signup")}
+              onPress={() => props.navigation.navigate("SignIn")}
             />
           </View>
           <View style={{ position: "absolute", bottom: 0, width: "100%" }}>
@@ -192,4 +212,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SignIn;
+export default Signup;
