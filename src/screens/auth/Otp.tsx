@@ -1,3 +1,4 @@
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import OTPInputView from "@twotalltotems/react-native-otp-input";
 import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
@@ -6,8 +7,13 @@ import TextButton from "../../components/ui/TextButton";
 import { COLORS } from "../../constants/colors";
 import { FONTS } from "../../constants/fonts";
 import { SIZES } from "../../constants/sizes";
+import { AuthStackParamList } from "../../routes/AuthStack";
 
-const Otp = () => {
+type OtpProps = NativeStackScreenProps<AuthStackParamList, "Otp">;
+
+const Otp = (props: OtpProps) => {
+  const { email } = props.route.params;
+
   const [timer, setTimer] = useState(60);
 
   useEffect(() => {
@@ -30,7 +36,7 @@ const Otp = () => {
     <View style={styles.container}>
       <AuthLayout
         title={"OTP Authentication"}
-        subTitle={"An authentication code has been sent to your mail"}
+        subTitle={`An authentication code has been sent to ${email}`}
         titleContainerStyle={{
           marginTop: SIZES.padding * 2,
         }}

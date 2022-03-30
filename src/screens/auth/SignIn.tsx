@@ -104,7 +104,7 @@ const SignIn = (props: SigninProps) => {
               containerStyle={{ backgroundColor: COLORS.transparent }}
               label={"Forgot Password?"}
               labelStyle={{ color: COLORS.gray, ...FONTS.body4 }}
-              onPress={() => props.navigation.navigate("Otp")}
+              onPress={() => props.navigation.navigate("ForgotPassword")}
             />
           </View>
           <TextButton
