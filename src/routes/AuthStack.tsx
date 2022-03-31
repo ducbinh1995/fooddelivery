@@ -5,6 +5,7 @@ import Otp from "../screens/auth/Otp";
 import SignIn from "../screens/auth/SignIn";
 import Signup from "../screens/auth/Signup";
 import Onboarding from "../screens/onboarding/Onboarding";
+import MainDrawer from "./MainDrawer";
 
 export type AuthStackParamList = {
   Onboarding: undefined;
@@ -14,6 +15,7 @@ export type AuthStackParamList = {
   Otp: {
     email: string;
   };
+  MainDrawer: undefined;
 };
 
 const Stack = createNativeStackNavigator<AuthStackParamList>();
@@ -26,6 +28,7 @@ const AuthStack = () => {
       <Stack.Screen name="Signup" component={Signup} />
       <Stack.Screen name="Otp" component={Otp} />
       <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
+      <Stack.Screen name="MainDrawer" component={MainDrawer} />
     </Stack.Navigator>
   );
 };

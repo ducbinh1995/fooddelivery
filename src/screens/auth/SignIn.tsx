@@ -120,7 +120,7 @@ const SignIn = (props: SigninProps) => {
             }}
             label={"Sign In"}
             labelStyle={{}}
-            onPress={() => {}}
+            onPress={() => props.navigation.navigate("MainDrawer")}
             disabled={!(email !== "" && password !== "" && emailError === "")}
           />
           <View style={[styles.saveMeContainer, { justifyContent: "center" }]}>
