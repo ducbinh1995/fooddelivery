@@ -13,10 +13,13 @@ import {
   View,
 } from "react-native";
 import Animated from "react-native-reanimated";
+import { useSelector } from "react-redux";
 import { COLORS } from "../constants/colors";
 import { FONTS } from "../constants/fonts";
 import { SIZES } from "../constants/sizes";
 import Home from "../screens/Home/Home";
+import { RootState, useAppDispatch } from "../store/store";
+import { setSelectedTab } from "../store/tabSlice";
 
 export type MainDrawerParamList = {
   Home: undefined;
@@ -24,11 +27,24 @@ export type MainDrawerParamList = {
 
 const Drawer = createDrawerNavigator<MainDrawerParamList>();
 
-const CustomDrawerItem: FC<{ label: string; icon: ImageSourcePropType }> = (
-  props
-) => {
+const CustomDrawerItem: FC<{
+  label: string;
+  icon: ImageSourcePropType;
+  isFocus: boolean;
+  onSelect: () => void;
+}> = (props) => {
   return (
-    <TouchableOpacity style={styles.menuButton}>
+    <TouchableOpacity
+      style={[
+        styles.menuButton,
+        {
+          backgroundColor: props.isFocus
+            ? COLORS.transparentBlack1
+            : COLORS.transparent,
+        },
+      ]}
+      onPress={props.onSelect}
+    >
       <Image
         style={{ width: 20, height: 20, tintColor: COLORS.white }}
         source={props.icon}
@@ -40,9 +56,11 @@ const CustomDrawerItem: FC<{ label: string; icon: ImageSourcePropType }> = (
   );
 };
 
-const CustomDrawerContents: FC<{ navigation: DrawerNavigationHelpers }> = (
-  props
-) => {
+const CustomDrawerContents: FC<{
+  navigation: DrawerNavigationHelpers;
+  selectedTab: string;
+  onPressTab: (tab: string) => void;
+}> = (props) => {
   return (
     <DrawerContentScrollView
       scrollEnabled={true}
@@ -89,18 +107,38 @@ const CustomDrawerContents: FC<{ navigation: DrawerNavigationHelpers }> = (
           <CustomDrawerItem
             label="Home"
             icon={require("../../assets/images/home.png")}
+            isFocus={props.selectedTab === "home"}
+            onSelect={() => {
+              props.onPressTab("home");
+              props.navigation.navigate("Home");
+            }}
           />
           <CustomDrawerItem
             label="My Wallet"
             icon={require("../../assets/images/wallet.png")}
+            isFocus={props.selectedTab === "wallet"}
+            onSelect={() => {
+              props.onPressTab("wallet");
+              // props.navigation.navigate("Home");
+            }}
           />
           <CustomDrawerItem
             label="Notification"
             icon={require("../../assets/images/notification.png")}
+            isFocus={props.selectedTab === "notifcation"}
+            onSelect={() => {
+              props.onPressTab("notifcation");
+              // props.navigation.navigate("Home");
+            }}
           />
           <CustomDrawerItem
             label="Favourite"
             icon={require("../../assets/images/favourite.png")}
+            isFocus={props.selectedTab === "favorite"}
+            onSelect={() => {
+              props.onPressTab("favorite");
+              // props.navigation.navigate("Home");
+            }}
           />
           <View
             style={{
@@ -113,22 +151,47 @@ const CustomDrawerContents: FC<{ navigation: DrawerNavigationHelpers }> = (
           <CustomDrawerItem
             label="Track Your Order"
             icon={require("../../assets/images/location.png")}
+            isFocus={props.selectedTab === "location"}
+            onSelect={() => {
+              props.onPressTab("location");
+              // props.navigation.navigate("Home");
+            }}
           />
           <CustomDrawerItem
             label="Coupons"
             icon={require("../../assets/images/coupon.png")}
+            isFocus={props.selectedTab === "coupon"}
+            onSelect={() => {
+              props.onPressTab("coupon");
+              // props.navigation.navigate("Home");
+            }}
           />
           <CustomDrawerItem
             label="Settings"
             icon={require("../../assets/images/setting.png")}
+            isFocus={props.selectedTab === "setting"}
+            onSelect={() => {
+              props.onPressTab("setting");
+              // props.navigation.navigate("Home");
+            }}
           />
           <CustomDrawerItem
             label="Invite a friend"
             icon={require("../../assets/images/profile.png")}
+            isFocus={props.selectedTab === "profile"}
+            onSelect={() => {
+              props.onPressTab("profile");
+              // props.navigation.navigate("Home");
+            }}
           />
           <CustomDrawerItem
             label="Help Center"
             icon={require("../../assets/images/help.png")}
+            isFocus={props.selectedTab === "help"}
+            onSelect={() => {
+              props.onPressTab("help");
+              // props.navigation.navigate("Home");
+            }}
           />
         </View>
         <View
@@ -136,11 +199,17 @@ const CustomDrawerContents: FC<{ navigation: DrawerNavigationHelpers }> = (
             position: "absolute",
             bottom: SIZES.padding,
             left: SIZES.radius,
+            width: "100%",
           }}
         >
           <CustomDrawerItem
             label="Logout"
             icon={require("../../assets/images/logout.png")}
+            isFocus={props.selectedTab === "logout"}
+            onSelect={() => {
+              props.onPressTab("logout");
+              // props.navigation.navigate("Home");
+            }}
           />
         </View>
       </Animated.View>
@@ -149,6 +218,13 @@ const CustomDrawerContents: FC<{ navigation: DrawerNavigationHelpers }> = (
 };
 
 const MainDrawer = () => {
+  const { selectedTab } = useSelector((state: RootState) => state.tab);
+  const dispatch = useAppDispatch();
+
+  const onPressTab = (tab: string) => {
+    dispatch(setSelectedTab(tab));
+  };
+
   return (
     <View style={{ flex: 1, backgroundColor: COLORS.primary }}>
       <Drawer.Navigator
@@ -159,7 +235,13 @@ const MainDrawer = () => {
           sceneContainerStyle: { backgroundColor: COLORS.transparent },
         }}
         drawerContent={(props) => {
-          return <CustomDrawerContents navigation={props.navigation} />;
+          return (
+            <CustomDrawerContents
+              navigation={props.navigation}
+              selectedTab={selectedTab}
+              onPressTab={onPressTab}
+            />
+          );
         }}
       >
         <Drawer.Screen
