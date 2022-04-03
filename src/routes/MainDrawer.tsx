@@ -17,12 +17,12 @@ import { useSelector } from "react-redux";
 import { COLORS } from "../constants/colors";
 import { FONTS } from "../constants/fonts";
 import { SIZES } from "../constants/sizes";
-import Home from "../screens/Home/Home";
+import MainLayout from "../screens/mainlayout/MainLayout";
 import { RootState, useAppDispatch } from "../store/store";
 import { setSelectedTab } from "../store/tabSlice";
 
 export type MainDrawerParamList = {
-  Home: undefined;
+  MainLayout: undefined;
 };
 
 const Drawer = createDrawerNavigator<MainDrawerParamList>();
@@ -245,8 +245,8 @@ const MainDrawer = () => {
         }}
       >
         <Drawer.Screen
-          name="Home"
-          component={Home}
+          name="MainLayout"
+          component={MainLayout}
           options={{ headerShown: false }}
         />
       </Drawer.Navigator>

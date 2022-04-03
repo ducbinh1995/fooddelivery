@@ -1,7 +1,8 @@
 import { DrawerScreenProps, useDrawerStatus } from "@react-navigation/drawer";
 import { LinearGradient } from "expo-linear-gradient";
-import React, { FC, useEffect } from "react";
+import React, { FC, useEffect, useRef } from "react";
 import {
+  FlatList,
   ImageSourcePropType,
   StyleProp,
   StyleSheet,
@@ -14,6 +15,7 @@ import {
 import Animated, {
   Extrapolate,
   interpolate,
+  interpolateColor,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
@@ -29,7 +31,7 @@ import { MainDrawerParamList } from "../../routes/MainDrawer";
 import { RootState, useAppDispatch } from "../../store/store";
 import { setSelectedTab } from "../../store/tabSlice";
 
-type HomeProps = DrawerScreenProps<MainDrawerParamList, "Home">;
+type MainLayoutProps = DrawerScreenProps<MainDrawerParamList, "MainLayout">;
 
 const TabButton: FC<{
   label: string;
@@ -52,14 +54,16 @@ const TabButton: FC<{
             source={props.icon}
             width={20}
             height={20}
-            containerStyle={{ tintColor: COLORS.gray }}
+            containerStyle={{
+              tintColor: props.isFocus ? COLORS.white : COLORS.gray,
+            }}
           />
           {props.isFocus && (
             <Text
               numberOfLines={1}
               style={{
                 marginLeft: SIZES.base,
-                color: COLORS.gray,
+                color: props.isFocus ? COLORS.white : COLORS.gray,
                 ...FONTS.h3,
               }}
             >
@@ -72,7 +76,30 @@ const TabButton: FC<{
   );
 };
 
-const Home = (props: HomeProps) => {
+const BOTTOM_TABS = [
+  {
+    id: "1",
+    label: "home",
+  },
+  {
+    id: "2",
+    label: "search",
+  },
+  {
+    id: "3",
+    label: "cart",
+  },
+  {
+    id: "4",
+    label: "favourite",
+  },
+  {
+    id: "5",
+    label: "notification",
+  },
+];
+
+const MainLayout = (props: MainLayoutProps) => {
   const { selectedTab } = useSelector((state: RootState) => state.tab);
   const dispatch = useAppDispatch();
 
@@ -103,16 +130,18 @@ const Home = (props: HomeProps) => {
     };
   });
 
+  const flatlistRef = useRef<FlatList>(null);
+
   const homeTabFlex = useSharedValue(1);
-  const homeTabColor = useSharedValue(COLORS.white);
+  const homeTabColor = useSharedValue(0);
   const searchTabFlex = useSharedValue(1);
-  const searchTabColor = useSharedValue(COLORS.white);
+  const searchTabColor = useSharedValue(0);
   const cartTabFlex = useSharedValue(1);
-  const cartTabColor = useSharedValue(COLORS.white);
+  const cartTabColor = useSharedValue(0);
   const favouriteTabFlex = useSharedValue(1);
-  const favouriteTabColor = useSharedValue(COLORS.white);
+  const favouriteTabColor = useSharedValue(0);
   const notificationTabFlex = useSharedValue(1);
-  const notificationTabColor = useSharedValue(COLORS.white);
+  const notificationTabColor = useSharedValue(0);
 
   const homeFlexStyle = useAnimatedStyle(() => {
     return {
@@ -121,8 +150,13 @@ const Home = (props: HomeProps) => {
   });
 
   const homeColorStyle = useAnimatedStyle(() => {
+    const bgColor = interpolateColor(
+      homeTabColor.value,
+      [0, 1],
+      [COLORS.white, COLORS.primary]
+    );
     return {
-      backgroundColor: homeTabColor.value,
+      backgroundColor: bgColor as string,
     };
   });
 
@@ -133,8 +167,13 @@ const Home = (props: HomeProps) => {
   });
 
   const searchColorStyle = useAnimatedStyle(() => {
+    const bgColor = interpolateColor(
+      searchTabColor.value,
+      [0, 1],
+      [COLORS.white, COLORS.primary]
+    );
     return {
-      backgroundColor: searchTabColor.value,
+      backgroundColor: bgColor as string,
     };
   });
 
@@ -145,8 +184,13 @@ const Home = (props: HomeProps) => {
   });
 
   const cartColorStyle = useAnimatedStyle(() => {
+    const bgColor = interpolateColor(
+      cartTabColor.value,
+      [0, 1],
+      [COLORS.white, COLORS.primary]
+    );
     return {
-      backgroundColor: cartTabColor.value,
+      backgroundColor: bgColor as string,
     };
   });
 
@@ -157,8 +201,13 @@ const Home = (props: HomeProps) => {
   });
 
   const favouriteColorStyle = useAnimatedStyle(() => {
+    const bgColor = interpolateColor(
+      favouriteTabColor.value,
+      [0, 1],
+      [COLORS.white, COLORS.primary]
+    );
     return {
-      backgroundColor: favouriteTabColor.value,
+      backgroundColor: bgColor as string,
     };
   });
 
@@ -169,48 +218,71 @@ const Home = (props: HomeProps) => {
   });
 
   const notificationColorStyle = useAnimatedStyle(() => {
+    const bgColor = interpolateColor(
+      notificationTabColor.value,
+      [0, 1],
+      [COLORS.white, COLORS.primary]
+    );
     return {
-      backgroundColor: notificationTabColor.value,
+      backgroundColor: bgColor as string,
     };
   });
 
-  useEffect(() => {
+  useUpdateEffect(() => {
     if (selectedTab === "home") {
+      flatlistRef.current?.scrollToIndex({
+        index: 0,
+        animated: false,
+      });
       homeTabFlex.value = withTiming(4, { duration: 500 });
-      homeTabColor.value = withTiming(COLORS.primary, { duration: 500 });
+      homeTabColor.value = withTiming(1, { duration: 500 });
     } else {
       homeTabFlex.value = withTiming(1, { duration: 500 });
-      homeTabColor.value = withTiming(COLORS.white, { duration: 500 });
-    }
-    if (selectedTab === "cart") {
-      cartTabFlex.value = withTiming(4, { duration: 500 });
-      cartTabColor.value = withTiming(COLORS.primary, { duration: 500 });
-    } else {
-      cartTabFlex.value = withTiming(1, { duration: 500 });
-      cartTabColor.value = withTiming(COLORS.white, { duration: 500 });
-    }
-    if (selectedTab === "favourite") {
-      favouriteTabFlex.value = withTiming(4, { duration: 500 });
-      favouriteTabColor.value = withTiming(COLORS.primary, { duration: 500 });
-    } else {
-      favouriteTabFlex.value = withTiming(1, { duration: 500 });
-      favouriteTabColor.value = withTiming(COLORS.white, { duration: 500 });
+      homeTabColor.value = withTiming(0, { duration: 500 });
     }
     if (selectedTab === "search") {
+      flatlistRef.current?.scrollToIndex({
+        index: 1,
+        animated: false,
+      });
       searchTabFlex.value = withTiming(4, { duration: 500 });
-      searchTabColor.value = withTiming(COLORS.primary, { duration: 500 });
+      searchTabColor.value = withTiming(1, { duration: 500 });
     } else {
       searchTabFlex.value = withTiming(1, { duration: 500 });
-      searchTabColor.value = withTiming(COLORS.white, { duration: 500 });
+      searchTabColor.value = withTiming(0, { duration: 500 });
+    }
+    if (selectedTab === "cart") {
+      flatlistRef.current?.scrollToIndex({
+        index: 2,
+        animated: false,
+      });
+      cartTabFlex.value = withTiming(4, { duration: 500 });
+      cartTabColor.value = withTiming(1, { duration: 500 });
+    } else {
+      cartTabFlex.value = withTiming(1, { duration: 500 });
+      cartTabColor.value = withTiming(0, { duration: 500 });
+    }
+    if (selectedTab === "favourite") {
+      flatlistRef.current?.scrollToIndex({
+        index: 3,
+        animated: false,
+      });
+      favouriteTabFlex.value = withTiming(4, { duration: 500 });
+      favouriteTabColor.value = withTiming(1, { duration: 500 });
+    } else {
+      favouriteTabFlex.value = withTiming(1, { duration: 500 });
+      favouriteTabColor.value = withTiming(0, { duration: 500 });
     }
     if (selectedTab === "notification") {
-      notificationTabFlex.value = withTiming(4, { duration: 500 });
-      notificationTabColor.value = withTiming(COLORS.primary, {
-        duration: 500,
+      flatlistRef.current?.scrollToIndex({
+        index: 4,
+        animated: false,
       });
+      notificationTabFlex.value = withTiming(4, { duration: 500 });
+      notificationTabColor.value = withTiming(1, { duration: 500 });
     } else {
       notificationTabFlex.value = withTiming(1, { duration: 500 });
-      notificationTabColor.value = withTiming(COLORS.white, { duration: 500 });
+      notificationTabColor.value = withTiming(0, { duration: 500 });
     }
   }, [selectedTab]);
 
@@ -254,9 +326,28 @@ const Home = (props: HomeProps) => {
           </TouchableOpacity>
         }
       />
-      <View style={{ flex: 1 }}>
-        <Text>Mainlayout</Text>
-      </View>
+      <FlatList
+        ref={flatlistRef}
+        horizontal
+        scrollEnabled={false}
+        pagingEnabled
+        snapToAlignment="center"
+        snapToInterval={SIZES.width}
+        showsHorizontalScrollIndicator={false}
+        data={BOTTOM_TABS}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item, index }) => {
+          return (
+            <View style={{ height: SIZES.height, width: SIZES.width }}>
+              {item.label === "home" && <Text>Home</Text>}
+              {item.label === "search" && <Text>Search</Text>}
+              {item.label === "cart" && <Text>Cart</Text>}
+              {item.label === "favourite" && <Text>Favourite</Text>}
+              {item.label === "notification" && <Text>Notification</Text>}
+            </View>
+          );
+        }}
+      />
       <View style={styles.footerContainer}>
         <LinearGradient
           start={{ x: 0, y: 0 }}
@@ -359,4 +450,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Home;
+export default MainLayout;
