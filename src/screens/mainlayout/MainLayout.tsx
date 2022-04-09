@@ -30,6 +30,7 @@ import useUpdateEffect from "../../hooks/useUpdateEffect";
 import { MainDrawerParamList } from "../../routes/MainDrawer";
 import { RootState, useAppDispatch } from "../../store/store";
 import { setSelectedTab } from "../../store/tabSlice";
+import Home from "../home/Home";
 
 type MainLayoutProps = DrawerScreenProps<MainDrawerParamList, "MainLayout">;
 
@@ -339,7 +340,7 @@ const MainLayout = (props: MainLayoutProps) => {
         renderItem={({ item, index }) => {
           return (
             <View style={{ height: SIZES.height, width: SIZES.width }}>
-              {item.label === "home" && <Text>Home</Text>}
+              {item.label === "home" && <Home />}
               {item.label === "search" && <Text>Search</Text>}
               {item.label === "cart" && <Text>Cart</Text>}
               {item.label === "favourite" && <Text>Favourite</Text>}
